@@ -1,0 +1,14 @@
+.draggable-image {
+  position: relative;
+}
+
+.delete-button {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.draggable-image:hover .delete-button {
+  visibility: visible;
+  opacity: 1;
+}
