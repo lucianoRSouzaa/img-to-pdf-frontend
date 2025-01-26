@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from "react";
 import { Rnd, RndDragCallback, RndResizeCallback } from "react-rnd";
 import { ImageElement } from "./PageEditor";
