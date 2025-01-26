@@ -2,11 +2,11 @@ import { FileIconSVG, TrashIconSVG } from "./svg";
 
 type PageTabProps = {
   name: string;
-}
+};
 
 export function PageTab({ name }: PageTabProps) {
   return (
-    <div className="p-3 border border-neutral-700 flex items-center justify-between rounded-2xl">
+    <div className="p-3 border border-neutral-700 hover:bg-neutral-800 transition-all duration-200 flex items-center justify-between rounded-2xl">
       <div className="flex items-center gap-4">
         <FileIconSVG />
         <p className="text-neutral-300 text-base">{name}</p>
@@ -14,5 +14,5 @@ export function PageTab({ name }: PageTabProps) {
 
       <TrashIconSVG />
     </div>
-  )
+  );
 }
