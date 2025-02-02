@@ -17,6 +17,7 @@ export default function Home() {
     handleDeleteImage,
     handleUpdateImage,
     handleAddImage,
+    handleAddLinkImage,
   } = useImages({
     selectedPageId,
     setSelectedPageId,
@@ -28,23 +29,26 @@ export default function Home() {
   return (
     <div style={{ padding: 40 }}>
       <div className="flex justify-center gap-[8vw]">
-        {pages.map((page, pageIndex) => (
-          <PageEditor
-            key={page.id}
-            pageIndex={pageIndex}
-            images={page.images}
-            selectedId={
-              selectedPageId === page.id
-                ? selectedImageId ?? undefined
-                : undefined
-            }
-            onSelectImage={(imgId) => handleSelectImage(page.id, imgId)}
-            onBringToFront={(imgId) => handleBringToFront(page.id, imgId)}
-            onDeleteImage={(imgId) => handleDeleteImage(page.id, imgId)}
-            onUpdateImage={(img) => handleUpdateImage(page.id, img)}
-            onAddImage={(file) => handleAddImage(page.id, file)}
-          />
-        ))}
+        <div className="flex flex-col gap-3">
+          {pages.map((page, pageIndex) => (
+            <PageEditor
+              key={page.id}
+              pageIndex={pageIndex}
+              images={page.images}
+              selectedId={
+                selectedPageId === page.id
+                  ? selectedImageId ?? undefined
+                  : undefined
+              }
+              onSelectImage={(imgId) => handleSelectImage(page.id, imgId)}
+              onBringToFront={(imgId) => handleBringToFront(page.id, imgId)}
+              onDeleteImage={(imgId) => handleDeleteImage(page.id, imgId)}
+              onUpdateImage={(img) => handleUpdateImage(page.id, img)}
+              onAddImage={(file) => handleAddImage(page.id, file)}
+              onAddLinkImage={(link) => handleAddLinkImage(page.id, link)}
+            />
+          ))}
+        </div>
 
         <div className="w-[512px]">
           <div className="h-[calc(94vh-30px)] rounded-2xl w-[32vw] max-w-[512px] fixed p-6 bg-dark">
