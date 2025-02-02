@@ -39,7 +39,7 @@ const PageEditor: React.FC<PageEditorProps> = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <p>Página {pageIndex + 1}</p>
 
       <div className="w-[595px] h-[842px] border border-gray-300 relative overflow-hidden">
@@ -56,7 +56,7 @@ const PageEditor: React.FC<PageEditorProps> = ({
             }}
           />
         ))}
-        {/* Botão de upload no canto */}
+
         <div style={{ position: "absolute", bottom: 10, right: 10 }}>
           <input type="file" onChange={handleFileChange} />
         </div>
