@@ -93,6 +93,28 @@ export function useImages({
     );
   };
 
+  const handleAddLinkImage = (pageId: string, link: string) => {
+    setZCounter(zCounter + 1);
+    const newImg: ImageElement = {
+      id: uuidv4(),
+      src: link,
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      zIndex: zCounter + 1,
+    };
+    setPages((prev) =>
+      prev.map((p) => {
+        if (p.id !== pageId) return p;
+        return {
+          ...p,
+          images: [...p.images, newImg],
+        };
+      })
+    );
+  };
+
   return {
     selectedImageId,
     handleSelectImage,
@@ -100,5 +122,6 @@ export function useImages({
     handleDeleteImage,
     handleUpdateImage,
     handleAddImage,
+    handleAddLinkImage,
   };
 }
