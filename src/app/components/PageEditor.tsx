@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import DraggableImage from "./DraggableImage";
+import { EmptyPageEditor } from "./EmptyPageEditor";
 
 export interface ImageElement {
   id: string;
@@ -20,9 +21,10 @@ interface PageEditorProps {
   onDeleteImage: (imgId: string) => void;
   onUpdateImage: (updated: ImageElement) => void;
   onAddImage: (file: File) => void;
+  onAddLinkImage: (link: string) => void;
 }
 
-const PageEditor: React.FC<PageEditorProps> = ({
+const PageEditor = ({
   pageIndex,
   images,
   selectedId,
@@ -31,11 +33,64 @@ const PageEditor: React.FC<PageEditorProps> = ({
   onDeleteImage,
   onUpdateImage,
   onAddImage,
-}) => {
+  onAddLinkImage,
+}: PageEditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      if (!file.type.startsWith("image/")) {
+        alert("O arquivo selecionado não é uma imagem.");
+        return;
+      }
+
       onAddImage(e.target.files[0]);
+
+      fileInputRef.current!.value = "";
     }
+  };
+
+  const handleAddLinkImage = (link: string) => {
+    onAddLinkImage(link);
+  };
+
+  const openFileExplorer = () => {
+    fileInputRef.current?.click();
+  };
+
+  const renderImages = () => {
+    if (!images || images.length === 0) {
+      return (
+        <EmptyPageEditor
+          handleAddLinkImage={() =>
+            handleAddLinkImage("https://placehold.co/600x400.jpg")
+          }
+          openFileExplorer={openFileExplorer}
+        />
+      );
+    }
+
+    return images.map((img) => (
+      <DraggableImage
+        key={img.id}
+        data={img}
+        isSelected={selectedId === img.id}
+        onSelect={() => onSelectImage(img.id)}
+        onBringToFront={() => onBringToFront(img.id)}
+        onDelete={() => onDeleteImage(img.id)}
+        onChange={(newX, newY, w, h) => {
+          onUpdateImage({
+            ...img,
+            x: newX,
+            y: newY,
+            width: w,
+            height: h,
+          });
+        }}
+      />
+    ));
   };
 
   return (
@@ -43,23 +98,15 @@ const PageEditor: React.FC<PageEditorProps> = ({
       <p>Página {pageIndex + 1}</p>
 
       <div className="w-[595px] h-[842px] border border-gray-300 relative overflow-hidden">
-        {images.map((img) => (
-          <DraggableImage
-            key={img.id}
-            data={img}
-            isSelected={selectedId === img.id}
-            onSelect={() => onSelectImage(img.id)}
-            onBringToFront={() => onBringToFront(img.id)}
-            onDelete={() => onDeleteImage(img.id)}
-            onChange={(newX, newY, w, h) => {
-              onUpdateImage({ ...img, x: newX, y: newY, width: w, height: h });
-            }}
-          />
-        ))}
+        {renderImages()}
 
-        <div style={{ position: "absolute", bottom: 10, right: 10 }}>
-          <input type="file" onChange={handleFileChange} />
-        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          style={{ display: "none" }}
+        />
       </div>
     </div>
   );
