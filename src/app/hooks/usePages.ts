@@ -2,28 +2,27 @@
 
 import { useState } from "react";
 import { ImageElement } from "../components/PageEditor";
-import { v4 as uuidv4 } from "uuid";
 
-export interface PageData {
+export type Page = {
   id: string;
   images: ImageElement[];
-}
+};
 
 export function usePage() {
-  const [pages, setPages] = useState<PageData[]>([
-    { id: uuidv4(), images: [] },
-  ]);
-  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [pages, setPages] = useState<Page[]>([{ id: "page-1", images: [] }]);
+  const [activePage, setActivePage] = useState<string>("page-1");
 
-  const addPage = () => {
-    setPages((prev) => [...prev, { id: uuidv4(), images: [] }]);
+  const addNewPage = () => {
+    const newPageId = `page-${pages.length + 1}`;
+    setPages([...pages, { id: newPageId, images: [] }]);
+    setActivePage(newPageId);
   };
 
   return {
     pages,
-    addPage,
+    addNewPage,
     setPages,
-    selectedPageId,
-    setSelectedPageId,
+    activePage,
+    setActivePage,
   };
 }

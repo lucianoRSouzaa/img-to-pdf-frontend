@@ -1,6 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import DraggableImage from "./DraggableImage";
 import { EmptyPageEditor } from "./EmptyPageEditor";
+import ResizableImage from "./ResizableImage";
+import { Page } from "../hooks";
+import { toBase64 } from "../utils";
+import { FolderIconSVG, LinkIconSVG } from "./svg";
 
 export interface ImageElement {
   id: string;
@@ -12,32 +16,50 @@ export interface ImageElement {
   zIndex: number;
 }
 
-interface PageEditorProps {
+// interface PageEditorProps {
+//   pageIndex: number;
+//   images: ImageElement[];
+//   selectedId?: string;
+//   onSelectImage: (imgId: string) => void;
+//   onBringToFront: (imgId: string) => void;
+//   onDeleteImage: (imgId: string) => void;
+//   onUpdateImage: (updated: ImageElement) => void;
+//   onAddImage: (file: File) => void;
+//   onAddLinkImage: (link: string) => void;
+// }
+
+interface DocumentPageProps {
+  page: Page;
+  isActive: boolean;
+  onPageClick: () => void;
+  onImageUpdate: (image: ImageElement) => void;
+  onImageClick: (imageId: string) => void;
+  onImageDelete: (imageId: string) => void;
+  onImageSelected: (pageId: string, base64: string) => void;
   pageIndex: number;
-  images: ImageElement[];
-  selectedId?: string;
-  onSelectImage: (imgId: string) => void;
-  onBringToFront: (imgId: string) => void;
-  onDeleteImage: (imgId: string) => void;
-  onUpdateImage: (updated: ImageElement) => void;
-  onAddImage: (file: File) => void;
-  onAddLinkImage: (link: string) => void;
 }
 
 const PageEditor = ({
+  page,
+  isActive = false,
+  onPageClick,
+  onImageUpdate,
+  onImageSelected,
+  onImageClick,
+  onImageDelete,
   pageIndex,
-  images,
-  selectedId,
-  onSelectImage,
-  onBringToFront,
-  onDeleteImage,
-  onUpdateImage,
-  onAddImage,
-  onAddLinkImage,
-}: PageEditorProps) => {
+}: DocumentPageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [activeImageId, setActiveImageId] = useState<string | null>(null);
+
+  const handleImageClick = (imageId: string) => {
+    setActiveImageId(imageId);
+    onImageClick(imageId);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
@@ -46,49 +68,43 @@ const PageEditor = ({
         return;
       }
 
-      onAddImage(e.target.files[0]);
+      const base64 = await toBase64(file);
+
+      onImageSelected(page.id, base64 as string);
 
       fileInputRef.current!.value = "";
     }
   };
 
-  const handleAddLinkImage = (link: string) => {
-    onAddLinkImage(link);
-  };
+  // const handleAddLinkImage = (link: string) => {
+  //   onAddLinkImage(link);
+  // };
 
   const openFileExplorer = () => {
     fileInputRef.current?.click();
   };
 
   const renderImages = () => {
-    if (!images || images.length === 0) {
+    if (!page.images || page.images.length === 0) {
       return (
         <EmptyPageEditor
           handleAddLinkImage={() =>
-            handleAddLinkImage("https://placehold.co/600x400.jpg")
+            onImageSelected(page.id, "https://placehold.co/600x400.jpg")
           }
           openFileExplorer={openFileExplorer}
         />
       );
     }
 
-    return images.map((img) => (
-      <DraggableImage
-        key={img.id}
-        data={img}
-        isSelected={selectedId === img.id}
-        onSelect={() => onSelectImage(img.id)}
-        onBringToFront={() => onBringToFront(img.id)}
-        onDelete={() => onDeleteImage(img.id)}
-        onChange={(newX, newY, w, h) => {
-          onUpdateImage({
-            ...img,
-            x: newX,
-            y: newY,
-            width: w,
-            height: h,
-          });
-        }}
+    return page.images.map((image) => (
+      <ResizableImage
+        key={image.id}
+        image={image}
+        pageRef={pageRef}
+        onUpdate={onImageUpdate}
+        onClick={() => handleImageClick(image.id)}
+        onDelete={() => onImageDelete(image.id)}
+        isActive={activeImageId === image.id}
       />
     ));
   };
@@ -97,7 +113,14 @@ const PageEditor = ({
     <div className="flex flex-col gap-2">
       <p>Página {pageIndex + 1}</p>
 
-      <div className="w-[595px] h-[842px] border border-gray-300 relative overflow-hidden">
+      <div
+        ref={pageRef}
+        onClick={onPageClick}
+        className={`w-[595px] h-[842px] border border-gray-300 relative bg-white shadow-md mx-auto ${
+          isActive ? "ring-2 ring-primary" : ""
+        }`}
+        style={{ aspectRatio: "8.5/11" }}
+      >
         {renderImages()}
 
         <input
@@ -107,6 +130,15 @@ const PageEditor = ({
           accept="image/*"
           style={{ display: "none" }}
         />
+
+        <div className="absolute py-3 px-3 gap-5 top-1/2 left-[-68px] flex flex-col justify-between items-center border border-neutral-400 rounded-xl">
+          <div>
+            <FolderIconSVG fill="#030303" height="20" width="20" />
+          </div>
+          <div>
+            <LinkIconSVG fill="#030303" height="20" width="20" />
+          </div>
+        </div>
       </div>
     </div>
   );

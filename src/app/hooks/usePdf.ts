@@ -20,23 +20,27 @@ export function usePdf({ pages }: usePdfProps) {
       })),
     };
 
-    try {
-      const response = await fetch("http://localhost:5001/generate_pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(layout),
-      });
-      const data = await response.json();
-      if (data.pdf_url) {
-        window.open(`http://localhost:5001${data.pdf_url}`, "_blank");
-      } else {
-        console.error(data);
-        alert("Erro ao gerar PDF");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Falha na requisição");
-    }
+    console.log({
+      layout,
+    });
+
+    // try {
+    //   const response = await fetch("http://localhost:5001/generate_pdf", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(layout),
+    //   });
+    //   const data = await response.json();
+    //   if (data.pdf_url) {
+    //     window.open(`http://localhost:5001${data.pdf_url}`, "_blank");
+    //   } else {
+    //     console.error(data);
+    //     alert("Erro ao gerar PDF");
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Falha na requisição");
+    // }
   };
 
   return {
