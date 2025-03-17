@@ -131,11 +131,14 @@ const PageEditor = ({
           style={{ display: "none" }}
         />
 
-        <div className="absolute py-3 px-3 gap-5 top-1/2 left-[-68px] flex flex-col justify-between items-center border border-neutral-400 rounded-xl">
-          <div>
+        <div className="absolute top-1/2 left-[-68px] flex flex-col justify-between items-center border border-neutral-400 rounded-xl">
+          <div
+            onClick={openFileExplorer}
+            className="hover:bg-neutral-800/30 cursor-pointer px-3 pt-3 pb-2.5 rounded-xl"
+          >
             <FolderIconSVG fill="#030303" height="20" width="20" />
           </div>
-          <div>
+          <div className="hover:bg-neutral-800/30 cursor-pointer px-3 pb-3 pt-2.5 rounded-xl">
             <LinkIconSVG fill="#030303" height="20" width="20" />
           </div>
         </div>
